@@ -33,3 +33,23 @@ jobs:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)/website'
       ArtifactName: 'website'
     displayName: 'Publish website artifacts'
+
+- job: DeployBlueEnvironment
+  steps:
+  - ... # Steps to build and deploy the "blue" environment
+
+- job: ValidateBlueEnvironment
+  dependsOn: DeployBlueEnvironment
+  steps:
+  - ... # Steps to run Pester tests against the "blue" environment
+
+- job: DeployGreenEnvironment
+  dependsOn: ValidateBlueEnvironment
+  steps:
+  - ... # Steps to build and deploy the "green" environment
+
+- job: SwapTraffic
+  dependsOn: DeployGreenEnvironment
+  steps:
+  - script: az network traffic-manager endpoint set-status --name <your-traffic-manager-profile-name> --resource-group <your-resource-group> --type azureEndpoints --endpoint-name <your-endpoint-name> --status Enabled
+    displayName: 'Enable Traffic to Green Environment'
