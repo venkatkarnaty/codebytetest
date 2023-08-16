@@ -53,3 +53,5 @@ jobs:
   steps:
   - script: az network traffic-manager endpoint set-status --name <your-traffic-manager-profile-name> --resource-group <your-resource-group> --type azureEndpoints --endpoint-name <your-endpoint-name> --status Enabled
     displayName: 'Enable Traffic to Green Environment'
+    env:
+      AZURE_CLI_DISABLE_CONNECTION_VERIFICATION: 'true'
