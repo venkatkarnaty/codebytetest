@@ -1,0 +1,35 @@
+# azure-pipelines.yml
+trigger:
+- '*'
+
+pool:
+  vmImage: 'windows-latest'
+
+jobs:
+- job: DeployWebsite
+  steps:
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: '5.x'
+      installationPath: $(Agent.ToolsDirectory)/dotnet
+    displayName: 'Install .NET Core SDK'
+
+  - script: dotnet tool install -g bicep
+    displayName: 'Install Bicep CLI'
+
+  - script: bicep build templates/main.bicep
+    displayName: 'Build Bicep template'
+
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: 'website'
+      Contents: '**'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)/website'
+    displayName: 'Copy website files'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)/website'
+      ArtifactName: 'website'
+    displayName: 'Publish website artifacts'
